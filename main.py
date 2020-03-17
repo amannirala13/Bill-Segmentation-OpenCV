@@ -10,32 +10,32 @@ import cv2 as cv
 def detectAndDisplay(frame):
     frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
     frame_gray = cv.equalizeHist(frame_gray)
-    #-- Detect faces
-    faces = face_cascade.detectMultiScale(frame_gray)
-    print (faces)
-    for (x,y,w,h) in faces:
+    #-- Detect bills
+    bills = bill_cascade.detectMultiScale(frame_gray)
+    print (bills)
+    for (x,y,w,h) in bills:
         center = (x + w//2, y + h//2)
-        frame = cv.ellipse(frame, center, (w//2, h//2), 0, 0, 360, (255, 0, 255), 4)
-        faceROI = frame_gray[y:y+h,x:x+w]
-        #-- In each face, detect eyes
-        eyes = eyes_cascade.detectMultiScale(faceROI)
-        print (eyes)
-        for (x2,y2,w2,h2) in eyes:
-            eye_center = (x + x2 + w2//2, y + y2 + h2//2)
-            radius = int(round((w2 + h2)*0.25))
-            frame = cv.circle(frame, eye_center, radius, (255, 0, 0 ), 4)
-    cv.imshow('testABC', frame)
+        cv.putText(frame,"Receipt",(x+w//3,y+15),cv.FONT_HERSHEY_PLAIN,1,(0,0,255),1)
+        cv.rectangle(frame,(x,y),(x+w,y+h),(0,0,255),2)
+        billROI = frame_gray[y:y+h,x:x+w]
+        
+        #-- In each bill, detect data sections
+        '''
+        datasec = data_cascade.detectMultiScale(billROI)
+        -------------------------------------------------------
+        Working on this section yet, data collection is being done to make a classifier for differenct data sections in a receipt.
+        This section is open for active contribution. Send your pull request with your data set included if you want to contribute
+        to this section.
+        -------------------------------------------------------
+        '''
+        
+    cv.imshow('Bill Detector', frame)
 
-face_cascade_name = './Dataset/receipt/classifier/cascade.xml'
-eyes_cascade_name = './Dataset/receipt/classifier/cascade.xml'
-face_cascade = cv.CascadeClassifier()
-eyes_cascade = cv.CascadeClassifier()
+bill_cascade_local = './Dataset/receipt/classifier/cascade.xml'
+bill_cascade = cv.CascadeClassifier()
 #-- 1. Load the cascades
-if not face_cascade.load(face_cascade_name):
-    print('--(!)Error loading face cascade')
-    exit(0)
-if not eyes_cascade.load(eyes_cascade_name):
-    print('--(!)Error loading eyes cascade')
+if not bill_cascade.load(bill_cascade_local):
+    print('--(!)Error loading bill cascade')
     exit(0)
 camera_device = 0
 #-- 2. Read the video stream
